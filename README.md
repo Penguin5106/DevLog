@@ -27,6 +27,7 @@ consolidation week
 
 over the consolidation week i have worked extensively on the second game jam "shoot 'em up" where the teaching I have received already has been invaluable, not just for bug fixing in the discord but the additional coding for cool kids club, what was posed as a solution for radial menu's (ATan2) came in handy for creating the aiming for a twin stick style shooter:
 
+/*
 FRotator ALightsCameraActionCharacter::GetAimRotation()
 {
 	// finds mouse position in viewport
@@ -46,3 +47,4 @@ FRotator ALightsCameraActionCharacter::GetAimRotation()
 	
 	return AimRotation;
 }
+*/
