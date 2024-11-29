@@ -51,3 +51,11 @@ FRotator ALightsCameraActionCharacter::GetAimRotation()
 however I did have to adjust one rotation to match the other so that they both operated in the same range of values, -180 to 180 as opposed to -90 to 270 or 0 to 360.
 
 In addition to the maths and logic coming in handy I am starting to become more familiar with both C++ and Unreal Engine's implimentation of it leading to fewer build errors and move onto the standard bugs quicker speeding up my C++ development massively particularly for the simpler more standard features such as input and additional components in a character.
+
+Shader Programming
+
+in my spare time between game jams I have been independently experimenting with HLSL, Unity's shader language creating several post-processing effects like dithering and a greyscale filter this has been a fascinating dive into how meshes become images and has introduced me to several concepts which will be useful when working with floats such as quantization and methods of modifying a 0 - 1 range into other ranges like -1 - 1.
+
+Unity
+
+To be able to create the best final product possible for game jam 3 I am learning unity for 2D games, and as such I am realising how similar it is to unreal engine with most if not all functions having direct equivalents as well as C++ and C# being Identical for every application I have had for them so far. As well as a crash course in unity this game jam serves as an opportunity to begin putting into practice a lot more "designer friendly" coding where I attempt to make as much as possible easy to tweak in the unity editor itself by serialising fields. I am also able to experience developing as a team and actually use some more source control features now that I have another programmer to work with (although it seems i am doing most of the work)
