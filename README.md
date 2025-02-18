@@ -59,3 +59,93 @@ in my spare time between game jams I have been independently experimenting with 
 Unity
 
 To be able to create the best final product possible for game jam 3 I am learning unity for 2D games, and as such I am realising how similar it is to unreal engine with most if not all functions having direct equivalents as well as C++ and C# being Identical for every application I have had for them so far. As well as a crash course in unity this game jam serves as an opportunity to begin putting into practice a lot more "designer friendly" coding where I attempt to make as much as possible easy to tweak in the unity editor itself by serialising fields. I am also able to experience developing as a team and actually use some more source control features now that I have another programmer to work with (although it seems i am doing almost all of the work). Through Game Jam 3 I found that much of Unity's documentation is easier to follow than unreal meaning i have spent less time in forums and more time in documentation for the research that led to the final product.
+
+GGJ and the final Game Jam
+
+Beginning with the global game jam, I explored Unreal Engine's AI systems for enemies in the most basic way possible to get enemies to target different things to attack, given the 5 day time constraint the fact that the game functioned while i was actively learning this new tool is a success. Then came the final game jam, the group picked Don't Duck Around, another project which required an AI however this time in Unity so that I could leverage the graphics programming I had done in unity to create a custom cell shader. For this i have constructed a Finite State Machine to be the underlying system that manages the Duck's Behaviour, this involved significant research into finite state machines themselves as well as methods of creating a timed repeating effect in unity I settled on a coroutine. Here is the code for the current version of the Finite State Machine and base State class as of 18/02/25:
+
+```
+public class FiniteStateMachine : MonoBehaviour
+{
+    private List<State> availableStates = new List<State>();
+    
+    private void Start()
+    {
+        // when the duck starts it moves into an idle state which acts as a break glass in emergency state from which the duck restarts its decisions
+        
+        availableStates.Add(this.AddComponent<State_Idle>());
+        availableStates.Add(this.AddComponent<State_Test>());
+        
+        StartIdleState();
+    }
+
+    void StartIdleState()
+    {
+        foreach (State state in availableStates)
+        {
+            if (state.GetType() == typeof(State_Idle))
+            {
+                // entering or activating a state requires a reference to the state machine which is used to call the exit function and an array of all states so that the state can select the exit condition
+                state.Activate(this, availableStates);
+            }
+        }
+    }
+
+    public void ExitFromState(State NextState)
+    {
+        // the duck will never not be in a state so exiting one state and starting a new one are the same thing
+        
+        NextState.Activate(this, availableStates);
+    }
+    
+}
+```
+```
+public class State : MonoBehaviour
+{
+    protected FiniteStateMachine stateMachine;
+    protected List<State> availableStates;
+    
+    /* states will activate by gathering necessary data, at minimum this is the machine that called it and an array of available states
+     * once all data is known it transitions into the state loop where it does its task and periodically checks if exit conditions have been met
+     * essentially bouncing between the state loop and check exit conditions function
+     * when an exit condition is met it calls exit which tells the state machine which state to use next
+     */
+    
+    public virtual void Activate(FiniteStateMachine CallingStateMachine, List<State> AvailableStates)
+    {
+        stateMachine = CallingStateMachine;
+        availableStates = AvailableStates;
+
+        State ExitCondition = null;
+        StartCoroutine(StateLoop(ExitCondition));
+    }
+
+    protected virtual IEnumerator StateLoop(State ExitCondition)
+    {
+        
+        while (!ExitCondition)
+        {
+            // do something
+        
+            ExitCondition = CheckExitCondiditons();
+
+            yield return new WaitForSeconds(0.2f);
+        }
+        
+        Exit(ExitCondition);
+    }
+
+    protected virtual State CheckExitCondiditons()
+    {
+        // if condition met return state to transition to
+        return availableStates[0];
+    }
+
+    protected virtual void Exit(State ConditionMet)
+    {
+        stateMachine.ExitFromState(ConditionMet);
+    }
+}
+```
+as you can see the State class is commented in such a way that it acts as both template and guide for creating future states which should also keep me working consistently across all states.
