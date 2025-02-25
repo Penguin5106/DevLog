@@ -149,3 +149,20 @@ public class State : MonoBehaviour
 }
 ```
 as you can see the State class is commented in such a way that it acts as both template and guide for creating future states which should also keep me working consistently across all states.
+
+CSGO Artefact
+
+For My CSGO artefact I decided to create a bullet hell game which used manipulation of time as its core mechanic. To spawn the masses of projectiles I created a spawner and spawn pattern manager which adresses arrays of references to spawners added from the level
+
+![image](https://github.com/user-attachments/assets/abf42ce4-f583-423f-8148-01532a532cb6)
+
+each spawner has spawning functions that target different locations such as the player or a specified location or to the opposite direction, most of this was basic stuff that both i had done before and then was covered in the workshop tasks however what was new was using a level sequence to issue the commands to the manager so that they can be plotted out in actual time which is also effected by the time dilation.
+it looks something like this : 
+
+![image](https://github.com/user-attachments/assets/b2f347cd-210d-4001-a9fe-71c1e62ab39b)
+
+This will prove to be a useful tool moving forwards when functions require a time based sequencing, and it was also one that took very little research to figure out with very few bugs along the way.
+
+Creating the manipulation of time was a good case study into how game engines implement certain features that perform actions over time such as timelines and timers since they were each affected by the time dilation. What took up a lot of the development time was figuring out that I had to map the linear input of the scroll wheel to a non linear effect, since 0.2-1 has the same effect as 1-5 my solution was to adjust the input by using it as the exponent to a dilation constant before changing the values with the following function : 
+
+![image](https://github.com/user-attachments/assets/af1554cd-f230-4998-95c5-96a7484895a1)
