@@ -170,3 +170,53 @@ This will prove to be a useful tool moving forwards when functions require a tim
 Creating the manipulation of time was a good case study into how game engines implement certain features that perform actions over time such as timelines and timers since they were each affected by the time dilation. What took up a lot of the development time was figuring out that I had to map the linear input of the scroll wheel to a non linear effect, since 0.2-1 has the same effect as 1-5 my solution was to adjust the input by using it as the exponent to a dilation constant before changing the values with the following function : 
 
 ![image](https://github.com/user-attachments/assets/af1554cd-f230-4998-95c5-96a7484895a1)
+
+Finite State Machine Optimisations
+
+I was watching youtube and came across someone talking about Finite State Machines, having made my own without looking at any sort of guide I decided to look at their implementation (https://youtu.be/r-RCfmQqLA0?t=766) and instantly felt like an idiot for not instantiating the different states rather than passing a hash set of possible states around. the next day I re-wrote both the state machine and state classes to look like this:
+```
+public class FiniteStateMachine : MonoBehaviour
+{
+    private State activeState = new State_Idle();
+
+    public NavMeshAgent _agent;
+
+    private void Start()
+    {
+        _agent = GetComponent<NavMeshAgent>();
+
+        StartCoroutine(MachineLoop());
+    }
+    
+    
+    private IEnumerator MachineLoop()
+    {
+        while(Application.isPlaying)
+        {
+            activeState = activeState.StateAction(this);
+
+            yield return new WaitForSeconds(0.2f);
+        }
+    }
+}
+
+```
+
+```
+public class State
+{
+    protected FiniteStateMachine stateMachine;
+
+    public virtual State StateAction(FiniteStateMachine StateMachine)
+    {
+        stateMachine = StateMachine;
+        
+        //Do a thing
+        
+        // maybe wait some time
+        
+        return new State();
+    }
+}
+```
+I also want to look at making this asynchronous to divorce it from the main thread and allow me to put the AI on a more reasonable loop rather than the coroutine that I am using at the moment.
