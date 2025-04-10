@@ -23,6 +23,10 @@ after looking at the reflective writing example it appears to follow this struct
 
 I have started researching how a rhythm game would work within UE5 opting to use C++ to maximise the learning possible within the confines of the project. After some research (https://www.youtube.com/watch?v=FgR35xDWbw4 and https://www.youtube.com/watch?v=F0PFHXUfa2Y among others) found that the best solution was to synchronise the code with the music through events trigerred in a level sequence, opting to keep it simple I had seperate events to open and close the hit window for each note however to impliment it fully I will change it to one event which opens and closes the window itself so that the gap can be consistent and I can make it modular for difficulty settings. I found most of the documentation I need is hidden away which is where forums like r/unrealengine and stack overflow are valuable resources, this is exactly how I came across this method of doing things with a clear explanation as to why (with enough time spent in the comments).
 
+Coding Club: Maths and Logic Primer
+
+This session of the club was extroadinarily helpful when it comes to my general understanding of how games work behind the seams, as such I have taken extensive notes of practical formulae which I may in the future build into a maths library of my own that focuses on relevant functions for game dev. it covered such things as methods of reading a 1 dimensional array as if it were 2 dimensional, how the modulo of a random number will end up biased unless you use a factor of the range for the modulo operation, euler angles vs radians, how square root functions are expensive, look at angles can be found using the change in y over change in x in the ATan2 function, how convert a theoretical movement on an angle into a usable change in x and y (and by extention vice versa), how a linear interpolation works, some logic gates, and how short circuit detection can allow for optimisation of logical evaluation. I am certain that I will end up using all of these as I continue this year. 
+
 consolidation week
 
 over the consolidation week i have worked extensively on the second game jam "shoot 'em up" where the teaching I have received already has been invaluable, not just for bug fixing in the discord but the additional coding for cool kids club, what was posed as a solution for radial menu's (ATan2) came in handy for creating the aiming for a twin stick style shooter:
@@ -50,15 +54,25 @@ FRotator ALightsCameraActionCharacter::GetAimRotation()
 ```
 however I did have to adjust one rotation to match the other so that they both operated in the same range of values, -180 to 180 as opposed to -90 to 270 or 0 to 360.
 
+Another thing that has become more and more routine since the I was introduced to it is considering how logical expressions can take advantage of short circuit detection to minorly improve the efficiency of my code.
+
 In addition to the maths and logic coming in handy I am starting to become more familiar with both C++ and Unreal Engine's implimentation of it leading to fewer build errors and move onto the standard bugs quicker speeding up my C++ development massively particularly for the simpler more standard features such as input and additional components in a character.
 
 Shader Programming
 
 in my spare time between game jams I have been independently experimenting with HLSL, Unity's shader language creating several post-processing effects like dithering and a greyscale filter this has been a fascinating dive into how meshes become images and has introduced me to several concepts which will be useful when working with floats such as quantization and methods of modifying a 0 - 1 range into other ranges like -1 - 1. using the shader programming youtube channel Acerola as inspiration and Freja Holmes' youtube tutorials on Unity shaders to inform how I impliment them, I now have many functional colour correction and stylistic effects including cell shading, dithering, brightness and exposure.
 
+Coding Club: Debugging - Practice of Programming
+
+once again I found Myself taking extensive notes during this session although this time they are more reminders to myself as many times the most successful approach to debugging is the one where you consider yourself an idiot and find the one place that it rings true, these notes include such wisdoms as: analyse the problem properly before you try to change any code, take breaks they help I promise, check for the most simple problems first a rogue semicolon can spell your doom even after many years in the industry. then came more practical steps that may simplify the bug hunt such as: testing in isolation - if it worked last time what did you change? or if you have a function can you test it with manual input and output? only change one thing at a time, should you find a mistake check for where else you may have made it to save future headaches, magic numbers can be forgotten so it is best to set them as constants using features like #define, defining edge cases allows you to manually work out what a portion of your code should do, and if you can replicate the bug then you can vary the method used to induce it and isolate the cause. we also raised awareness of possible likely scenarios that could break code like: negative numbers, zero, or powers of 2. Graphs can be a great tool to viualise when something breaks and it can be a good idea to keep record of how these results change when you change each part of the code. These are all meaningful steps that join rubber ducking in my arsenal and will hopefully become subconscious habit.
+
 Unity
 
 To be able to create the best final product possible for game jam 3 I am learning unity for 2D games, and as such I am realising how similar it is to unreal engine with most if not all functions having direct equivalents as well as C++ and C# being Identical for every application I have had for them so far. As well as a crash course in unity this game jam serves as an opportunity to begin putting into practice a lot more "designer friendly" coding where I attempt to make as much as possible easy to tweak in the unity editor itself by serialising fields. I am also able to experience developing as a team and actually use some more source control features now that I have another programmer to work with (although it seems i am doing almost all of the work). Through Game Jam 3 I found that much of Unity's documentation is easier to follow than unreal meaning i have spent less time in forums and more time in documentation for the research that led to the final product.
+
+Coding Club: Recursion
+
+in this session we covered recursion, the stack overflow error and ways to create non recursive versions of recursive functions to prevent such errors. Recursion is a practise I have encountered before and utilised unaware of the issues it can cause, because of this I paid extra attention and came away with valuable knowledge of steps to break down a recursive function often involving keeping a track of data that would normally be kept in the scope of each layer of recursion and implementing the repeated behaviour through a while loop. it was also noted that it is typically best to start by defining some exit conditions where the recursive function would stop and working backwards compared to how you would implement the behaviour recursively.
 
 Code Studio Tasks
 
@@ -220,3 +234,7 @@ public class State
 }
 ```
 I also want to look at making this asynchronous to divorce it from the main thread and allow me to put the AI on a more reasonable loop rather than the coroutine that I am using at the moment.
+
+Coding Club - Programming Tricks we got from AI
+
+This session covered both how Large Language models like chat GPT are really bad at coding for anything but low complexity generic problems since it regurgitates information from its training data, which also means that it is outdated constantly. the session then moved on to other forms of AI and how creating these systems has tought us valuable lessons like how blurring the lines between functions and data can lead to incredibly elegant solutions like complex event systems as well as how it lead to languages like perl for registry expressions and the efficiency that brings in sorting masses of data based soley on patterns. This talk also valuably gave me an insight into A star searches in data trees and how it avoids the pitfalls of depth first and breadth first searching particularly in data structures without a defined end. At some point I would like to dig into the actual code behind A star but that will be saved for another time.
