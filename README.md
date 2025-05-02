@@ -238,3 +238,205 @@ I also want to look at making this asynchronous to divorce it from the main thre
 Coding Club - Programming Tricks we got from AI
 
 This session covered both how Large Language models like chat GPT are really bad at coding for anything but low complexity generic problems since it regurgitates information from its training data, which also means that it is outdated constantly. the session then moved on to other forms of AI and how creating these systems has tought us valuable lessons like how blurring the lines between functions and data can lead to incredibly elegant solutions like complex event systems as well as how it lead to languages like perl for registry expressions and the efficiency that brings in sorting masses of data based soley on patterns. This talk also valuably gave me an insight into A star searches in data trees and how it avoids the pitfalls of depth first and breadth first searching particularly in data structures without a defined end. At some point I would like to dig into the actual code behind A star but that will be saved for another time.
+
+Navigation/Interaction AI
+
+This is likely the most complex piece of code I have ever written; This class is the Navigation state for the finite state machine I created for the game jam; it handles most of the duck's decision making and calls to the navmesh agent. This is the translation of the chance-based behaviours my designer laid out here:
+
+Action object in duck radius?
+Peaceful interactable 40% chance to interact
+Pickupable item 40% chance to pick up
+Every 10s held in mouth 20% more likely to attempt to swallow if swallowable & if not interacted with/swallow 10% more likely to drop
+After interaction ban on interaction with same object for 45s
+30% to do death interaction with object
+Is object breakable? 30% to peck. Every peck 40% more likely to peck again. Object initially has 30% chance to break. After every peck object is 20% more likely to break
+If no interactable objects around 10% chance to sleep for 10-15 seconds(+ an extra 5% if near something that gives off heat or carpet) 90% chance to scan for the nearest interact able object in ducks vicinity and move towards it.
+
+which I then made sense of in MS paint
+![AI plan - Organised](https://github.com/user-attachments/assets/fd6c9e09-133b-49b9-a4ea-e9b591ee404a)
+
+
+```
+public class State_Navigation : State
+{
+    
+    private NavMeshAgent _agent;
+
+    private float objectRange = 25;
+
+    public override State StateAction(FiniteStateMachine StateMachine)
+    {
+        stateMachine = StateMachine;
+        _agent = stateMachine._agent;
+        
+        if (!_agent) {return new State_Idle();}
+
+       
+        if (!_agent.isOnNavMesh)
+        {
+            return new State_Idle();
+        }
+        
+        if (!_agent.hasPath || _agent.isPathStale)
+        {
+            NavDecisionTree();
+        }
+        
+        return new State_Idle();
+        
+    }
+
+    private State Nav_ItemInRange(List<InteractableObject> objects)
+    {
+        int roll = Random.Range(1, 10);
+
+        if (roll <= 4)
+        {
+            InteractableObject interactableObject = GetRandomInteractableObjectWithTag(objects, "peaceful");
+            
+            if (interactableObject)
+            {
+                _agent.SetDestination(interactableObject.transform.position);
+
+                State_Interaction interact = new State_Interaction();
+
+                interact.TargetObject = interactableObject;
+                
+                return interact;
+            }
+            
+            return new State_Idle();
+        }
+        if (roll <= 8)
+        {
+            InteractableObject interactableObject = GetRandomInteractableObjectWithTag(objects, "harmful");
+            
+            if (interactableObject)
+            {
+                _agent.SetDestination(interactableObject.transform.position);
+
+                State_Interaction interact = new State_Interaction();
+
+                interact.TargetObject = interactableObject;
+                
+                return interact;
+            }
+            
+            return new State_Idle();
+        }
+        else
+        {
+            _agent.SetDestination(stateMachine.transform.position + new Vector3(Random.Range(-25, 25), Random.Range(-25, 25), Random.Range(-25, 25)));
+        }
+
+        return new State_Idle();
+    }
+
+    private State Nav_NoneInRange(InteractableObject interactableObject)
+    {
+        if (Random.Range(1, 10) == 1)
+        {
+            State_Sleep sleep = new State_Sleep();
+
+            sleep.Repetitions = 30;
+            
+            return sleep;
+        }
+        
+        _agent.SetDestination(interactableObject.transform.position);
+        
+        State_Interaction interact = new State_Interaction();
+
+        interact.TargetObject = interactableObject;
+        
+        return interact;
+    }
+
+    private InteractableObject GetRandomInteractableObjectWithTag(List<InteractableObject> objects, string tag)
+    {
+        objects.TrimExcess();
+        
+        List<InteractableObject> objectsCopy = new List<InteractableObject>(objects);
+        foreach (InteractableObject i in objectsCopy)
+        {
+            if (!i.gameObject.CompareTag(tag))
+            {
+                objects.Remove(i);
+                
+                continue;
+            }
+
+            if (i.onCooldown)
+            {
+                objects.Remove(i);
+            }
+        }
+
+        int count = objects.Count;
+
+        if (count == 0)
+        {
+            return null;
+        }
+
+        return objects[Random.Range(0, count - 1)];
+    }
+
+    private void NavDecisionTree()
+    {
+        InteractableObject[] interactableObjects = Object.FindObjectsByType<InteractableObject>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+
+        float LowestDistance = objectRange * 60;
+        
+        InteractableObject closestObjectInRange = null;
+        InteractableObject closestObject = null;
+        
+        List<InteractableObject> ObjectsInRange = new List<InteractableObject>();
+        
+        foreach (InteractableObject interactableObject in interactableObjects)
+        {
+            if (interactableObject.onCooldown)
+            {
+                continue;
+            }
+            
+            float distanceToObjectSquared = absolute_Difference2D(interactableObject.transform.position, stateMachine.transform.position).sqrMagnitude;
+            
+            if (distanceToObjectSquared < LowestDistance)
+            {
+                LowestDistance = distanceToObjectSquared;
+                
+                closestObject = interactableObject;
+
+                if (LowestDistance < objectRange)
+                {
+                    closestObjectInRange = interactableObject;
+                }
+            }
+
+            if (distanceToObjectSquared < objectRange)
+            {
+                ObjectsInRange.Add(interactableObject);
+            }
+            
+        }
+
+        if (closestObject == closestObjectInRange)
+        {
+            Nav_ItemInRange(ObjectsInRange);
+        }
+        else if (closestObject)
+        {
+            Nav_NoneInRange(closestObject);
+        }
+    }
+
+    private Vector2 absolute_Difference2D(Vector3 a, Vector3 b)
+    {
+        return new Vector2(Mathf.Abs(Mathf.Abs(a.x) - Mathf.Abs(b.x)), Mathf.Abs(Mathf.Abs(a.z) - Mathf.Abs(b.z)));
+    }
+    
+}
+```
+
+Remarkably, almost everything worked the first time. I had one small issue where the tag filtering didn't seem to work. It took some time, but eventually, I figured out that the compare tag function only compares the object that contains the script, not the entire hierarchy. I had tagged objects further up the hierarchy. To fix this, it was a simple case of tagging the individual interactable, which has the added benefit of allowing multiple interactables on the same object. Parts of the designer's intent are still not finished as of writing, but this covers the vast majority of it; the rest will be quite simple in comparison.
