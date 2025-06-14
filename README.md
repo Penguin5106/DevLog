@@ -1,24 +1,5 @@
 # CodeStudioDevLog_Year1
-
-# TODO: Delete this information when it is practiced enough to become useless
-The purpose of this devlog is to form the assessment submission for my Code Studio module. It must be reflective rather than descriptive, and it will be marked according to this grading scale:
-![image](https://github.com/user-attachments/assets/d6b3b1af-2c1e-4889-a8b5-8185159ba1ac)
-
-
-after looking at the reflective writing example it appears to follow this structure
-
-1 research and methodology followed when approaching the task
-
-2 problems that appeared (only major problems not i couldnt find the documentation), highlight where the research differs from reality
-
-3 methodology of fixing the issue along with any data and research to support
-
-4 what went well/wrong in both your original approach and how you fixed any issues
-
-5 how would you handle this next time based on what you have learned
-
-6 reference list
-
+This Devlog Strated as an assignment for my first year of uni, however I have decided to continue it for personal record so if the style changes massively its because I am no longer writing to a marking scheme just my own records.
 # DevLog Start
 
 I have started researching how a rhythm game would work within UE5 opting to use C++ to maximise the learning possible within the confines of the project. After some research (https://www.youtube.com/watch?v=FgR35xDWbw4 and https://www.youtube.com/watch?v=F0PFHXUfa2Y among others) found that the best solution was to synchronise the code with the music through events trigerred in a level sequence, opting to keep it simple I had seperate events to open and close the hit window for each note however to impliment it fully I will change it to one event which opens and closes the window itself so that the gap can be consistent and I can make it modular for difficulty settings. I found most of the documentation I need is hidden away which is where forums like r/unrealengine and stack overflow are valuable resources, this is exactly how I came across this method of doing things with a clear explanation as to why (with enough time spent in the comments).
@@ -444,3 +425,342 @@ Remarkably, almost everything worked the first time. I had one small issue where
 # post game jam reflections
 
 Since 3 of our teammates did not contribute, it is a wonder and a great achievement that we met the minimum viable product for the game; however, this did mean I didn't have the time to do adequate research on asynchronous programming to be able to use it. Though asynchronous programming still remains high on my list of concepts to learn along with quaternions and OpenGL. The task of creating the AI and interaction system both increased my knowledge of and put into practice many uses of polymorphism as well as beginning to explore more niche and powerful tools like coroutines, this has probably been both the most ambitious project and best learning experience so far. This game jam also has been the best team working experience yet, given our increased familiarity with each other after the global game jam and being able to use the full features of GitHub since we are not dealing with binary code assets like Unreal's blueprints. given the lack of active teammates, we had to scale back the project quite a lot almost to the minimum viable product but with a few extra things to make it at least look more polished such as the cel shader and the win and lose screens, we managed this without having to remove any features we had Implimented. The cel shader was a particularly interesting addition, and through creating it, it has made me want to explore graphics APIs so i can learn what is behind the macro nightmare that led to barely working shadows. All in all a good project to end on.
+
+# OpenGL
+
+Praise whoever put together learnopengl.com.
+This is the best tutorial for anything programming related I have ever used which is a godsend for starting such a big topic as a graphics API, it doesn't just explain the how it goes into why each step is taken, which is just how I like to learn. So legitimately props to whoever made it. 
+
+I knew getting into this that it was going to be a big challenge and take advantage of all of the knowlege that I had gained thus far, a perfect summer project.
+
+It starts with what OpenGL is and why it exists which puts into context every subsequent action, and made for very interesting reading, then step by step goes over the libraries used in the tutorial: GLFW and GLAD. GLFW is a context manager for OpenGL which we use mainly for creating a context and abstracting the operating system specific parts of the process. GLAD also helps deal with some of the operating system specific parts of the process particularly when it comes to interaction with the drivers of a single device. These libraries are fabulous and im pretty sure this is just my poor file management on my pc but it took a hot second to get visual studio to see them properly.
+
+Once everything was set up I quickly started to make good progress thanks to the comprehensive instruction of learnopengl.com. as of writing I have finished the textures portion under the getting started tab, heres a quick look at the steps along the way:
+
+![image](https://github.com/user-attachments/assets/0d3198c6-187e-46c0-9380-25511e5d3a67)
+![image](https://github.com/user-attachments/assets/324574be-0a8c-4a54-b024-43d8f44b9bef)
+![image](https://github.com/user-attachments/assets/41423900-9466-420e-99ea-5deebe2a2186)
+![image](https://github.com/user-attachments/assets/7bf89389-7771-42f7-a0e8-0568a4cf67a8)
+![image](https://github.com/user-attachments/assets/beb6a18b-0949-4f87-b99c-002419d4bbcb)
+![image](https://github.com/user-attachments/assets/ac9603ea-73c9-4716-8be1-93a5f3941a01)
+
+As you can see I am now as of writing at the point where I can load multiple textures onto the same triangle/triangles, what you arent seeing there is what is behind the scenes, that is what the code is for:
+
+```
+#include <iostream>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
+#include "stb_image.h"
+
+#include "Shader.h"
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+	// resize window
+	glViewport(0, 0, width, height);
+}
+
+void processInput(GLFWwindow* window)
+{
+	// checks for key press then does action
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	{
+		glfwSetWindowShouldClose(window, true);
+	}
+}
+
+void createTexture(unsigned int &texture, const char* path, GLenum slot, GLenum colourChannels)
+{
+	stbi_set_flip_vertically_on_load(true);
+	int width, height, nrChannels;
+	unsigned char* data = stbi_load(path, &width, &height, &nrChannels, 0);
+
+	glGenTextures(1, &texture);
+
+	glActiveTexture(slot);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, colourChannels, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load texture" << std::endl;
+	}
+
+	stbi_image_free(data);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+}
+
+int main()
+{
+	// initialise glfw
+	glfwInit();
+
+	// window settings
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	
+	// create window
+	GLFWwindow* window = glfwCreateWindow(800, 600, "Test Window", NULL, NULL);
+	// error check
+	if (window == NULL)
+	{
+		std::cout << "No Window Creation Failed" << std::endl;
+		glfwTerminate();
+		return -1;
+	}
+	glfwMakeContextCurrent(window);
+
+	// initialise GLAD (function pointer manager) 
+	// load opengl loader using os specific process for the load process + error check 
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	{
+		std::cout << "GLAD Initialisation Failed" << std::endl;
+		return -1;
+	}
+
+	// initialise opengl window to desktop at opsition 0,0 with dimensions 800,600
+	glViewport(0, 0, 800, 600);
+
+	// set function to be called in the event the window is resised
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+	// triangle vertices
+	float vertices[] = {
+	-0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  0.0f, 0.0f,
+	 0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f,
+	 0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.5f, 1.0f
+	}; // position    ---   colour   ---   texCoords
+
+	unsigned int triangleIndices[] = {
+		0, 1, 2
+	};
+
+	// rectangle vertex data for indexed drawing
+	float rectangleVertices[] = {
+		1.0f, 1.0f, 0.0f,
+		1.0f, - 1.0f, 0.0f,
+		-1.0f, -1.0f, 0.0f,
+		-1.0f, 1.0f, 0.0f
+	};
+	unsigned int rectangleIndices[] = {
+		0, 1, 3,
+		1, 2, 3
+	};
+
+	// create vertex array object
+	unsigned int VAO;
+	glGenVertexArrays(1, &VAO);
+
+	glBindVertexArray(VAO);
+
+	// create vertex buffer object with ID
+	unsigned int VBO;
+	glGenBuffers(1, &VBO);
+	// bind buffer to target
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	// puts data into bound buffer
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	// create element buffer object
+	unsigned int EBO;
+	glGenBuffers(1, &EBO);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(triangleIndices), triangleIndices, GL_STATIC_DRAW);
+
+
+	// textures
+	unsigned int texture;
+	createTexture(texture, "Shaders/wall.jpg", GL_TEXTURE0, GL_RGB);
+
+	unsigned int textureFace;
+	createTexture(textureFace, "Shaders/awesomeface.png", GL_TEXTURE1, GL_RGBA);
+
+	// shader
+	Shader myShader = Shader("Shaders/vertexShader.vs", "Shaders/fragmentShader.fs");
+	myShader.use();
+
+	myShader.setInt("BaseColour", 0);
+	myShader.setInt("MixColour", 1);
+
+
+	// assign 3 vertex positions to location 0 in shader, specifying location, number of values per variable, type of value, normalisation, size of value, and offset from the beginning of the buffer
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+
+	while (!glfwWindowShouldClose(window))
+	{
+		// input
+		processInput(window);
+
+		// rendering
+
+		// wipes colour buffer with set colour
+		glClearColor(1, 0, 1, 1);
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		// ensure rendering is done with correct shader and vertex array object
+		myShader.use();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, textureFace);
+
+		glBindVertexArray(VAO);
+
+		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+
+		glBindVertexArray(0);
+
+		// process window specific events
+		glfwPollEvents();
+		// swap buffer in use and display buffer
+		glfwSwapBuffers(window);
+	}
+
+	// cleans up glfw
+	glfwTerminate();
+	return 0;
+}
+```
+
+along with the class for shaders to make the process of compiling and linking them easier:
+
+```
+#include "Shader.h"
+
+Shader::Shader(const char* vertexPath, const char* fragmentPath)
+{
+
+	std::string vertexCode;
+	std::string fragmentCode;
+	std::ifstream vShaderFile;
+	std::ifstream fShaderFile;
+
+	vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+	fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+	
+	try
+	{
+		// open files
+		vShaderFile.open(vertexPath);
+		fShaderFile.open(fragmentPath);
+		std::stringstream vShaderStream, fShaderStream;
+
+		// read files buffer contents into streams
+		vShaderStream << vShaderFile.rdbuf();
+		fShaderStream << fShaderFile.rdbuf();
+
+		// close file handlers
+		vShaderFile.close();
+		fShaderFile.close();
+
+		// convert stream into string
+		vertexCode = vShaderStream.str();
+		fragmentCode = fShaderStream.str();
+	}
+	catch (std::ifstream::failure e)
+	{
+		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ" << std::endl;
+	}
+
+	const char* vShaderCode = vertexCode.c_str();
+	const char* fShaderCode = fragmentCode.c_str();
+
+
+	// create vertex shader and compile shaders
+	unsigned int vertexShader, fragmentShader;
+	vertexShader = glCreateShader(GL_VERTEX_SHADER);
+
+	glShaderSource(vertexShader, 1, &vShaderCode, NULL);
+	glCompileShader(vertexShader);
+
+	errorCheckShaderCompile(vertexShader);
+
+	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+
+	glShaderSource(fragmentShader, 1, &fShaderCode, NULL);
+	glCompileShader(fragmentShader);
+
+	errorCheckShaderCompile(fragmentShader);
+
+	// create and link shader program
+	ID = glCreateProgram();
+	glAttachShader(ID, vertexShader);
+	glAttachShader(ID, fragmentShader);
+	glLinkProgram(ID);
+
+	errorCheckShaderProgramLink(ID);
+
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragmentShader);
+}
+
+void Shader::use()
+{
+	glUseProgram(ID);
+}
+
+void Shader::setBool(const std::string& name, bool value) const
+{
+	glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value);
+}
+
+void Shader::setInt(const std::string& name, int value) const
+{
+	glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
+}
+
+void Shader::setFloat(const std::string& name, float value) const
+{
+	glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
+}
+
+void Shader::errorCheckShaderCompile(unsigned int shader)
+{
+	// error checking
+	int success;
+	char infoLog[512];
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+
+	if (!success)
+	{
+		glGetShaderInfoLog(shader, 512, NULL, infoLog);
+		std::cout << "ERROR::SHADER::COMPILATION_FAILED\n" << infoLog << std::endl;
+	}
+}
+
+void Shader::errorCheckShaderProgramLink(unsigned int shaderProgram)
+{
+	// error checking
+	int success;
+	char infoLog[512];
+	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+
+	if (!success)
+	{
+		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+		std::cout << "ERROR::SHADER::SHADERPROGRAM::LINKINGFAILED\n" << infoLog << std::endl;
+	}
+}
+```
+And the shaders themselves which arent too impressive at the moment comapered to what I have achieved using HLSL in unity, but I am just getting started and have made the progress in the more basic systems like setting up a window and rendering a triangle.
+
+Overall despite being an intimidationg topic it has been remarkably easy to follow and more importantly understand what is happening and why.
