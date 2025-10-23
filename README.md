@@ -769,3 +769,16 @@ void Shader::errorCheckShaderProgramLink(unsigned int shaderProgram)
 And the shaders themselves which arent too impressive at the moment comapered to what I have achieved using HLSL in unity, but I am just getting started and have made the progress in the more basic systems like setting up a window and rendering a triangle.
 
 Overall despite being an intimidating topic it has been remarkably easy to follow and more importantly understand what is happening and why.
+
+Since then I have refactored much of the code into easier to use classes, added the functionality of a camera with yaw pitch and roll in addition to movement. Adding the roll was a good exercise in visualisation and my understanding of maths in a 3D space to figure out (based on the example of the front vector) how to calculate the right vector based on sine and cosine waves of the euler rotation angles in radians. The learnOpenGL project is now public on my profile if you wish to examine my implementation.
+
+# Year 2
+
+Year 2 is underway and now after some time spent getting back into uni life and planning out I have picked my projects from now until christmas.
+
+The first will be to explore the networking features bundled in the Steamworks API in the ISteamNetworkMessages package, I am going to start by getting a successful connection, then send a chat message between 2 console app instances, and then impliment multiplayer movement using what I have learned into a fork of my OpenGl project.
+
+The second will be a train sandbox in unity, replicating similar functionality to Factorio's trains to explore features like interfaces and the MVC design pattern, I have begun planning this in a uml diagram. Of course all of this is subject to change:
+<img width="1232" height="1731" alt="image" src="https://github.com/user-attachments/assets/2e899adb-8ece-4c65-ad05-4df35d202aee" />
+
+I'm excited for these projects having selected them specifically to fill gaps in my knowledge.
