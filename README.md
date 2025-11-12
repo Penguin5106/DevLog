@@ -781,4 +781,7 @@ The first will be to explore the networking features bundled in the Steamworks A
 The second will be a train sandbox in unity, replicating similar functionality to Factorio's trains to explore features like interfaces and the MVC design pattern, I have begun planning this in a uml diagram. Of course all of this is subject to change:
 <img width="1232" height="1731" alt="image" src="https://github.com/user-attachments/assets/2e899adb-8ece-4c65-ad05-4df35d202aee" />
 
+as predicted this has changed, after seeing the debugging task ahead I have abandoned the gridless format above and begun restructuring to use a 2D grid, though I plan on revisiting the graph and node structure later when I do not have the time constraints or other projects to juggle at the same time, importantly I did confirm that the 2D grid based version still meets the requirements for the module.
+
+The networking project using Steamworks API is going very well, the server and client at current can find each other both on the internet and on LAN. the next steps for this will be to establish connection and then send the first messages between them, because of the progress I have made I am not worried about the deadline for this project so will likely dedicatemore time to the train sandbox.
 I'm excited for these projects having selected them specifically to fill gaps in my knowledge.
