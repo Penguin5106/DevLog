@@ -788,3 +788,33 @@ I'm excited for these projects having selected them specifically to fill gaps in
 
 I am now approaching the deadlines for my projects and the christmas break, at this point I have not made much further improvement on the Steamworks networking API project, the client and server still cannot connect. Having discussed this with my lecturers they have seen the documentation and my code, and they are satisfied that I have done enough work and learned enough from the project to get the grades. I would like to revisist this and make it work later but for now I have other deadlines to meet.
 The train sandbox is coming along nicely, I have almost everything set up I am just missing a few of the UI elements necessary to set up the train with its timetable and the related functions. I will no doubt then have to debug my pathfinding algorithm, but then it will be complete and I can make the video report for that.
+
+it has been a while since i have updated this. but those projects were successful and the following semester I created a flash game inspired tower defence game similar to age of war, that project was mostly held back by team dynamics including the other programmer leaving barely a month in. for program consoles i couldn't have said much if i wanted to because of the NDA for the devkits but i managed to use the playstation's graphics library and pad library to get snake functioning on the ps5 devkits without any engine.
+
+Maths For Games
+
+maths was a very simple module overall but an important one my artefact made the direction of everything relative, through the use of custom made quaternions, vectors and matrices shifting gravity based on the orientation of the room, the maths library itself was probably more impressive than the artefact intended to show it off, though there are things I would definitely do differently were I to rebuild it. for starters I would use more templating to make the library more flexible and less code overall, I would also employ a unit test framework and automate that process.
+
+summer
+
+summer is for starting projects, I don't expect to finish any project that happens now but they will form an important foundation for what is to come.
+
+I am going to begin the construction of my portfolio on a website designed by an artist friend of mine and built by me to run on a raspberry pi. this should give me some experience with html, css, javascript, docker, and the linux command line. All important tools.
+
+I am also going to start following the vulkan tutorial in the hopes of being somewhat near having a triangle on scree by the time I get around to 3rd year starting. but once again the summer is both my break and my chance to earn a little money so these are not strictly deadlined just something for a headstart.
+
+3rd year
+
+3rd year rolling around means I am once again unfathomably busy, at least the projects are interesting. 
+
+Realtime Interactive Group Project (RIGPr) 
+
+I have been assigned to metaverse vr to create a drone flight and reconnaissance sim in UE5 along with 3 other programmers and a handful of artists, designers, and a producer. after our first meeting with the clients and the interactions with the team so far I am hopeful that this team can pull its weight and we can have a project able to be taken to shows like DSET where past projects for this client have been shown and nominated for awards in the past.
+
+Final year Project (FYP)
+
+This is the big one, the vulkan foundation I have been building up over the summer has been to prepare for this, I want to create a 4 dimensional render pipeline. Using vulkan was the obvious choice since I would want low level control and flexibility, so armed with the vulkan tutorial and research on 4 dimensional shapes I am going to explore the feasibility of the 4th dimension in puzzle games and realtime rendering as a whole.
+
+Programming Systems for Games (PSGam)
+
+I left this one to last because it somewhat feeds into my FYP, I also plan to use vulkan for this project to create a basic (and i mean very basic) modelling software that could be extended to 4 dimensions for use with my FYP. the use of vulkan here is for the sole purpose of being able to adapt it to the 4 dimensional pipeline I create for the FYP, so if i find it isn't sensible I may swap to unity.
